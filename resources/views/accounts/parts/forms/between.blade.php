@@ -1,4 +1,3 @@
-<h5>Transfer between my accounts</h5>
 <form action="/send" method="POST">
 @csrf
 	<div class="input-group">
