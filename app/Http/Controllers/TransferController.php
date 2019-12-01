@@ -23,24 +23,31 @@ class TransferController extends Controller
             'account_id' => 'required',
             'sender_account_number' => 'required',
             'receiver_account_number' => 'required|min:12',
-            'amount' => 'required',
+            'amount' => 'required|numeric|min:0|not_in:0',
         ]);
 
-        $transfer->addTransfer($validated, $validated['account_id'], false);
+            
+            $ownerAccount = Account::findOrFail($request->account_id);
+            $receiverAccount = Account::where('account_number', $request->receiver_account_number)->firstOrFail();
         
+        if ($request->amount <= $ownerAccount->balance && $ownerAccount->exists() && $receiverAccount->exists()) {
+            // NEW SENDER TRANSFER
+                $transfer->addTransfer($validated, $validated['account_id'], false);
+            // UPDATE SENDER ACCOUNT
+                $ownerAccount->updateBalance(false, $request->amount);
 
-    // UPDATE SENDER ACCOUNT
-        $ownerAccount = Account::findOrFail($request->account_id);
-        $ownerAccount->updateBalance(false, $request->amount);
-       
-    // UPDATE RECEIVER ACCOUNT
-        $receiverAccount = Account::where('account_number', $request->receiver_account_number)->firstOrFail();
-        $receiverAccount->updateBalance(true, $request->amount);
-       
-    // NEW RECEIVER TRANSFER
-        $transfer->addTransfer($validated, $receiverAccount->id, true);
+            // UPDATE RECEIVER ACCOUNT
+                $receiverAccount->updateBalance(true, $request->amount);
+               
+            // NEW RECEIVER TRANSFER
+                $transfer->addTransfer($validated, $receiverAccount->id, true);
 
-        return redirect()->back()->with('status', 'Money successfully transfered to account '.$request->receiver_account_number);
+
+            return redirect()->back()->with('status', 'Money successfully transfered to account '.$request->receiver_account_number);
+        } else {
+            return redirect()->back()->with('status', 'Nice try, but transfer was unsuccessful. Please check all input fields and try again');
+        }
+        
     }
 
 }
