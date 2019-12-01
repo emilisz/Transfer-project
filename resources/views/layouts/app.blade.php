@@ -25,6 +25,10 @@
         .transfer-red h4{
             color:red;
         }
+
+        .transfer{
+            background-color: #e9ecef;
+        }
     </style>
 </head>
 <body>
@@ -80,7 +84,8 @@
             </div>
         </nav>
 
-        <main class="py-4">
+        <main>
+            @include('layouts.messages')
             <div class="container">
                 @yield('content')
             </div>

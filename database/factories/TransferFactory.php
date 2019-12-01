@@ -18,8 +18,8 @@ $factory->define(App\Transfer::class, function (Faker $faker) {
     return [
         'user_id' => $faker->randomDigit(),
         'account_id' => $faker->randomDigit(),
-        'sender_account_number' => $faker->swiftBicNumber(),
-        'receiver_account_number' => $faker->swiftBicNumber(),
+        'sender_account_number' => 'LT'.rand(1000000000,9999999999),
+        'receiver_account_number' => 'LT'.rand(1000000000,9999999999),
         'amount' => $faker->randomFloat($nbMaxDecimals = 2, $min = 1, $max = 900),
     ];
 });

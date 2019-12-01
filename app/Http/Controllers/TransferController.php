@@ -35,34 +35,32 @@ class TransferController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Transfer $transfer,Request $request)
     {
-        // dd($request->all());
-        $transfer = new Transfer;
-        $transfer->user_id = Auth::id();
-        $transfer->account_id = $request->account_id;
-        $transfer->sender_account_number = $request->sender_account_number;
-        $transfer->receiver_account_number = $request->receiver_account_number;
-        $transfer->amount = -$request->amount;
-        $transfer->save();
+       
+        $validated = request()->validate([
+            'user_id' => 'required',
+            'account_id' => 'required',
+            'sender_account_number' => 'required',
+            'receiver_account_number' => 'required|min:12',
+            'amount' => 'required',
+        ]);
 
-        $ownerAccount = Account::find($request->account_id);
-        $ownerAccount->balance = $ownerAccount->balance - $request->amount;
-        $ownerAccount->save();
+        $transfer->addTransfer($validated, $validated['account_id'], false);
+        
 
+    // UPDATE SENDER ACCOUNT
+        $ownerAccount = Account::findOrFail($request->account_id);
+        $ownerAccount->updateBalance(false, $request->amount);
+       
+    // UPDATE RECEIVER ACCOUNT
         $receiverAccount = Account::where('account_number', $request->receiver_account_number)->firstOrFail();
-        $receiverAccount->balance = $receiverAccount->balance + $request->amount;
-        $receiverAccount->save();
+        $receiverAccount->updateBalance(true, $request->amount);
+       
+    // NEW RECEIVER TRANSFER
+        $transfer->addTransfer($validated, $receiverAccount->id, true);
 
-        $transfer = new Transfer;
-        $transfer->user_id = $receiverAccount->user->id;
-        $transfer->account_id = $receiverAccount->id;
-        $transfer->sender_account_number = $request->sender_account_number;
-        $transfer->receiver_account_number = $request->receiver_account_number;
-        $transfer->amount = $request->amount;
-        $transfer->save();
-
-        return redirect()->back();
+        return redirect()->back()->with('status', 'Money successfully transfered to account! '.$request->receiver_account_number);
 
     }
 

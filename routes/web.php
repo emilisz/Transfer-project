@@ -18,4 +18,6 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'AccountController@index')->name('home');
+Route::get('/home/{account}', 'AccountController@show')->name('home.account');
 Route::post('/send', 'TransferController@store')->name('send');
+Route::post('/create', 'AccountController@store')->name('create');

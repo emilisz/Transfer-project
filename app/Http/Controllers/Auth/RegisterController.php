@@ -79,9 +79,9 @@ class RegisterController extends Controller
         ]);
 
         Transfer::create([
-            'user_id' => $user->id,
+            'user_id' => 1,
             'account_id'=> $account->id,
-            'sender_account_number'=> 'LT7777777777',
+            'sender_account_number'=> ' "Happy Christmas" :)',
             'receiver_account_number'=> $account->account_number,
             'amount' => 1000
         ]);

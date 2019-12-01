@@ -18,4 +18,22 @@ class Transfer extends Model
     {
     	return $this->belongsTo('App\User');
     }
+
+
+    public function addTransfer($transfer, $account, $method)
+    {
+        if ($method) {
+           $sum = $transfer['amount'];
+        } else {
+            $sum = -$transfer['amount'];
+        }
+
+       return $this->create([
+            'user_id' => $transfer['user_id'],
+            'account_id'=> $account,
+            'sender_account_number'=> $transfer['sender_account_number'],
+            'receiver_account_number'=> $transfer['receiver_account_number'],
+            'amount' => $sum,
+       ]);
+    }
 }
