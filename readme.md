@@ -1,4 +1,4 @@
-# simple transfer project
+# SIMPLE MONEY TRANSFER APP
 
 ## Getting started
 
